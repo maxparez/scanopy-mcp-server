@@ -14,6 +14,11 @@ This file defines how Claude CLI should work autonomously on this repo. Keep it 
   - `verification-before-completion` (before claiming done)
   - `requesting-code-review` (before merging)
 
+## 1.1) Fresh library documentation (Context7)
+- For any external library usage or API details, consult Context7 first.
+- Always call `resolve-library-id` before `get-library-docs`.
+- Prefer official/primary sources over blog posts or secondary summaries.
+
 ## 2) Planning and execution
 - For any non-trivial change, write a plan first.
 - Plan format: `docs/plans/YYYY-MM-DD-<topic>.md`.
