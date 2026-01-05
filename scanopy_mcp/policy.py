@@ -28,4 +28,7 @@ class PolicyGuard:
             raise ValueError(f"Tool '{tool_name}' is not allowlisted for write operations")
 
         if confirm != self.confirm_string:
-            raise ValueError("Invalid confirm string - write operations require explicit confirmation")
+            raise ValueError(
+                "Invalid confirm string - "
+                "write operations require explicit confirmation"
+            )

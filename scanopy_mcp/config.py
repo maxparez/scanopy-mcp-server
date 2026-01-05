@@ -26,4 +26,7 @@ def load_config() -> Config:
     if not base_url or not api_key:
         raise ValueError("SCANOPY_BASE_URL and SCANOPY_API_KEY are required")
 
+    if not confirm_string or not confirm_string.strip():
+        raise ValueError("SCANOPY_CONFIRM_STRING must be a non-empty string")
+
     return Config(base_url=base_url.rstrip("/"), api_key=api_key, confirm_string=confirm_string)

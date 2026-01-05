@@ -27,7 +27,7 @@ class OpenAPILoader:
             OpenAPI specification as a dictionary.
         """
         now = time.time()
-        if self._cache and (now - self._loaded_at) < self.ttl_seconds:
+        if self._cache is not None and (now - self._loaded_at) < self.ttl_seconds:
             return self._cache
 
         resp = httpx.get(self.url, timeout=5)
