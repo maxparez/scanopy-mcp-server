@@ -58,6 +58,7 @@ Use other models as *consultants only*, never as the primary executor.
   - regression risks
   - test coverage gaps
 - If requested, produce a formal code review summary.
+- After every commit, request a review from Codex GPT (this repo’s orchestrator) and wait for feedback before starting the next task.
 
 ## 7) Secrets handling
 - Never store secrets in repo files.
