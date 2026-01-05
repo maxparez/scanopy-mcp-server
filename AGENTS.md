@@ -33,6 +33,7 @@ This file defines how the Codex GPT agent should operate in this repo.
 - **Codex GPT‑5.2 xhigh**: architecture decisions, code review, MCP protocol details.
 - **Gemini Flash 3.0**: quick second opinions, naming, docs wording.
 - Never share secrets or API keys in consultations.
+- For any external library usage or API details, consult Context7 first (`resolve-library-id` → `get-library-docs`).
 
 ## 5) GitHub workflow
 - Ensure a remote exists before pushing.
