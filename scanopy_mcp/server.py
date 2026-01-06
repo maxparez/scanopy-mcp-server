@@ -52,6 +52,11 @@ class ScanopyMCPServer:
         tool = self._tools[name]
         method = tool["method"]
         path = tool["path"]
+        required = tool.get("input_schema", {}).get("required", []) or []
+        missing = [field for field in required if field not in args]
+        if missing:
+            missing_list = ", ".join(missing)
+            raise ValueError(f"Missing required fields: {missing_list}")
 
         # Enforce policy for write operations
         if method in {"POST", "PUT", "PATCH", "DELETE"} and self._guard:
