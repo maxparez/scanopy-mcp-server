@@ -69,3 +69,22 @@ def test_request_sends_query_params_for_get(mocker):
     # Verify params were passed for GET (as query params)
     call_kwargs = httpx_mock.call_args[1]
     assert call_kwargs["params"] == {"limit": 10, "offset": 0}
+
+
+def test_request_includes_path_param_in_body_for_put(mocker):
+    """PUT should include id in body even when used in path."""
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = {"ok": True}
+    mock_response.raise_for_status = mocker.Mock()
+    httpx_mock = mocker.patch("httpx.Client.request", return_value=mock_response)
+
+    client = ScanopyClient(base_url="http://test", api_key="key123")
+    client.request(
+        "PUT",
+        "/api/v1/hosts/{id}",
+        json={"id": "abc", "name": "device", "hidden": False, "tags": []},
+        params={"id": "abc"},
+    )
+
+    call_kwargs = httpx_mock.call_args[1]
+    assert call_kwargs["json"]["id"] == "abc"

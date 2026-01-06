@@ -69,9 +69,10 @@ class ScanopyClient:
                     method, url, headers=self._headers(), params=other_params or None
                 )
             else:
-                # POST/PUT/PATCH/DELETE: use JSON body
+                # POST/PUT/PATCH/DELETE: use JSON body (prefer explicit json)
+                body = json if json is not None else (other_params or None)
                 resp = client.request(
-                    method, url, headers=self._headers(), json=other_params or None
+                    method, url, headers=self._headers(), json=body
                 )
 
             resp.raise_for_status()
