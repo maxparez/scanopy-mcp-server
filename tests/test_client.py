@@ -25,16 +25,16 @@ def test_request_includes_base_url(mocker):
 
 
 def test_request_passes_json_body(mocker):
-    """Client should pass JSON body in requests."""
+    """Client should pass JSON body in POST requests."""
     mock_response = mocker.Mock()
     mock_response.json.return_value = {"id": 1}
     mock_response.raise_for_status = mocker.Mock()
     httpx_mock = mocker.patch("httpx.Client.request", return_value=mock_response)
 
     client = ScanopyClient(base_url="http://test", api_key="key123")
-    client.request("POST", "/api/v1/hosts", json={"name": "test"})
+    client.request("POST", "/api/v1/hosts", params={"name": "test"})
 
-    # Verify JSON was passed
+    # Verify JSON was passed (POST uses body)
     call_kwargs = httpx_mock.call_args[1]
     assert call_kwargs["json"] == {"name": "test"}
 
@@ -49,9 +49,11 @@ def test_request_substitutes_path_params(mocker):
     client = ScanopyClient(base_url="http://test", api_key="key123")
     client.request("GET", "/api/v1/hosts/{id}", params={"id": 123})
 
-    # Verify path substitution
+    # Verify path substitution AND no query params (id is in path only)
     call_args = httpx_mock.call_args
     assert call_args[0][1] == "http://test/api/v1/hosts/123"
+    call_kwargs = httpx_mock.call_args[1]
+    assert call_kwargs["params"] is None  # No query params
 
 
 def test_request_sends_query_params_for_get(mocker):
@@ -62,8 +64,8 @@ def test_request_sends_query_params_for_get(mocker):
     httpx_mock = mocker.patch("httpx.Client.request", return_value=mock_response)
 
     client = ScanopyClient(base_url="http://test", api_key="key123")
-    client.request("GET", "/api/v1/hosts", json={"limit": 10, "offset": 0})
+    client.request("GET", "/api/v1/hosts", params={"limit": 10, "offset": 0})
 
-    # Verify params were passed for GET
+    # Verify params were passed for GET (as query params)
     call_kwargs = httpx_mock.call_args[1]
     assert call_kwargs["params"] == {"limit": 10, "offset": 0}

@@ -39,7 +39,7 @@ class ScanopyClient:
             method: HTTP method (GET, POST, PUT, PATCH, DELETE).
             path: Request path with {param} placeholders.
             json: Optional JSON body for request.
-            params: Optional path parameters to substitute in {placeholders}.
+            params: Optional all parameters (will be split into path/query/body).
 
         Returns:
             Parsed JSON response.
@@ -47,23 +47,32 @@ class ScanopyClient:
         Raises:
             httpx.HTTPStatusError: If the request fails.
         """
-        # Substitute path parameters (e.g., {id} -> actual value)
-        if params:
-            for key, value in params.items():
-                placeholder = f"{{{key}}}"
-                if placeholder in path:
-                    path = path.replace(placeholder, str(value))
+        params = params or {}
+
+        # Extract path params (those with {placeholder} in path)
+        path_params = {}
+        for key, value in params.items():
+            placeholder = f"{{{key}}}"
+            if placeholder in path:
+                path_params[key] = value
+                path = path.replace(placeholder, str(value))
+
+        # Remaining params go to query (GET) or body (POST/PUT/PATCH/DELETE)
+        other_params = {k: v for k, v in params.items() if k not in path_params}
 
         url = f"{self.base_url}{path}"
 
         with httpx.Client(timeout=self.timeout_s) as client:
-            # For GET requests, send remaining args as query params
-            if method.upper() == "GET" and json:
+            if method.upper() == "GET":
+                # GET: use query params, no body
                 resp = client.request(
-                    method, url, headers=self._headers(), params=json
+                    method, url, headers=self._headers(), params=other_params or None
                 )
             else:
-                resp = client.request(method, url, headers=self._headers(), json=json)
+                # POST/PUT/PATCH/DELETE: use JSON body
+                resp = client.request(
+                    method, url, headers=self._headers(), json=other_params or None
+                )
 
             resp.raise_for_status()
             return resp.json()

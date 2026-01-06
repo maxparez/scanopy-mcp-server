@@ -38,7 +38,7 @@ python -m scanopy_mcp.main
    echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_networks", "arguments": {"limit": 10}}, "id": 4}' | python -m scanopy_mcp.main
    ```
 
-5. **Call a write tool with path param (get host by ID):**
+5. **Call a read tool with path param (get host by ID):**
    ```bash
    echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_host_by_id", "arguments": {"id": "123"}}, "id": 5}' | python -m scanopy_mcp.main
    ```
