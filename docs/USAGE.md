@@ -27,6 +27,7 @@ python -m scanopy_mcp.main
    ```bash
    echo '{"jsonrpc": "2.0", "method": "tools/list", "id": 2}' | python -m scanopy_mcp.main
    ```
+   Use the returned `name` fields as tool names. These are the OpenAPI `operationId` values.
 
 3. **Call a read tool (list hosts):**
    ```bash

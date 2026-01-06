@@ -126,19 +126,32 @@ class MCPStdioServer:
         # Convert to MCP tool format
         mcp_tools = []
         for name, meta in tools.items():
+            method = meta.get("method", "GET")
+            is_write = method in {"POST", "PUT", "PATCH", "DELETE"}
+
+            base_schema = meta.get("input_schema") or {"type": "object", "properties": {}}
+            # Copy schema to avoid mutating registry data
+            input_schema = {
+                "type": "object",
+                "properties": dict(base_schema.get("properties", {})),
+            }
+            required = set(base_schema.get("required", []) or [])
+
+            if is_write:
+                input_schema["properties"]["confirm"] = {
+                    "type": "string",
+                    "description": "Confirmation string for write operations",
+                }
+                required.add("confirm")
+
+            if required:
+                input_schema["required"] = sorted(required)
+
             mcp_tools.append(
                 {
                     "name": name,
                     "description": f"{meta['method']} {meta['path']}",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {
-                            "confirm": {
-                                "type": "string",
-                                "description": "Confirmation string for write operations",
-                            }
-                        },
-                    },
+                    "inputSchema": input_schema,
                 }
             )
 

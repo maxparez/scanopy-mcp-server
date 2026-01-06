@@ -39,6 +39,55 @@ def test_stdio_server_handles_tools_list_request():
     assert any(t["name"] == "hosts.list" for t in response["result"]["tools"])
 
 
+def test_stdio_server_tools_list_includes_input_schema_and_confirm_for_writes():
+    """tools/list should include inputSchema and require confirm for write ops."""
+    config = Config(base_url="http://test", api_key="key", confirm_string="CONFIRM")
+    server = MCPStdioServer(
+        config=config,
+        openapi_url="",
+        allowlist={"create_host"},
+        openapi_spec={
+            "paths": {
+                "/api/v1/hosts": {
+                    "get": {
+                        "operationId": "get_all_hosts",
+                        "parameters": [
+                            {"name": "limit", "in": "query", "schema": {"type": "integer"}}
+                        ],
+                    },
+                    "post": {
+                        "operationId": "create_host",
+                        "requestBody": {
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {"name": {"type": "string"}},
+                                        "required": ["name"],
+                                    }
+                                }
+                            }
+                        },
+                    },
+                }
+            }
+        },
+    )
+
+    request = {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
+    response = server.handle_request(request)
+
+    tools = {t["name"]: t for t in response["result"]["tools"]}
+    read_schema = tools["get_all_hosts"]["inputSchema"]
+    assert "limit" in read_schema["properties"]
+    assert "confirm" not in read_schema["properties"]
+
+    write_schema = tools["create_host"]["inputSchema"]
+    assert "name" in write_schema["properties"]
+    assert "confirm" in write_schema["properties"]
+    assert "confirm" in write_schema.get("required", [])
+
+
 def test_stdio_server_handles_tools_call_request(mocker):
     """Server should call tools."""
     config = Config(

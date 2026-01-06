@@ -141,3 +141,85 @@ def test_registry_handles_missing_operation_id():
 
     # Should not crash, just skip
     assert len(tools) == 0
+
+
+def test_registry_builds_input_schema_from_parameters_and_body():
+    """Input schema should include path/query params and request body fields."""
+    spec = {
+        "paths": {
+            "/api/v1/hosts/{id}": {
+                "parameters": [
+                    {"name": "id", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "get": {
+                    "operationId": "get_host_by_id",
+                    "parameters": [
+                        {"name": "include", "in": "query", "schema": {"type": "string"}}
+                    ],
+                },
+                "put": {
+                    "operationId": "update_host",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {"name": {"type": "string"}},
+                                    "required": ["name"],
+                                }
+                            }
+                        }
+                    },
+                },
+            }
+        }
+    }
+
+    reg = ToolRegistry(spec, allowlist={"update_host"})
+    tools = reg.list_tools()
+
+    get_schema = tools["get_host_by_id"]["input_schema"]
+    assert "id" in get_schema["properties"]
+    assert "include" in get_schema["properties"]
+    assert "id" in get_schema["required"]
+
+    put_schema = tools["update_host"]["input_schema"]
+    assert "name" in put_schema["properties"]
+    assert "name" in put_schema["required"]
+
+
+def test_registry_resolves_ref_in_request_body_schema():
+    """Input schema should resolve local $ref schemas."""
+    spec = {
+        "components": {
+            "schemas": {
+                "HostUpdate": {
+                    "type": "object",
+                    "properties": {"name": {"type": "string"}},
+                    "required": ["name"],
+                }
+            }
+        },
+        "paths": {
+            "/api/v1/hosts/{id}": {
+                "parameters": [
+                    {"name": "id", "in": "path", "required": True, "schema": {"type": "string"}}
+                ],
+                "put": {
+                    "operationId": "update_host",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {"schema": {"$ref": "#/components/schemas/HostUpdate"}}
+                        }
+                    },
+                },
+            }
+        },
+    }
+
+    reg = ToolRegistry(spec, allowlist={"update_host"})
+    tools = reg.list_tools()
+
+    put_schema = tools["update_host"]["input_schema"]
+    assert "name" in put_schema["properties"]
+    assert "name" in put_schema["required"]
