@@ -57,4 +57,5 @@ class ScanopyMCPServer:
         if method in {"POST", "PUT", "PATCH", "DELETE"} and self._guard:
             self._guard.enforce_write(name, confirm=confirm)
 
-        return self._client.request(method, path, json=args)
+        # Pass all arguments - client will extract path params from them
+        return self._client.request(method, path, json=args, params=args)

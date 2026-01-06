@@ -30,7 +30,8 @@ def test_tools_call_requests_without_policy(mocker):
 
     result = server.tools_call("hosts.list", {})
 
-    client.request.assert_called_once_with("GET", "/api/v1/hosts", json={})
+    # Server now passes both json and params
+    client.request.assert_called_once_with("GET", "/api/v1/hosts", json={}, params={})
     assert result == {"result": "ok"}
 
 

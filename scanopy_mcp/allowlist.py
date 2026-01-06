@@ -1,21 +1,21 @@
 """Write operation allowlist for Scanopy MCP A-D scope."""
 
 # Write operations that are allowed to be called via MCP
-# Format: "resource.action" matching OpenAPI operationId
+# Format: actual OpenAPI operationId (snake_case)
 WRITE_ALLOWLIST = {
     # Discovery operations
-    "discoveries.create",
-    "discoveries.start",
-    "discoveries.stop",
+    "create_discovery",
+    "cancel_discovery",
+    "update_discovery",
     # Host operations
-    "hosts.update",
-    "hosts.merge",
+    "update_host",
+    "consolidate_hosts",
     # Network/subnet operations
-    "networks.create",
-    "networks.update",
-    "subnets.create",
-    "subnets.update",
+    "create_network",
+    "update_network",
+    "create_subnet",
+    "update_subnet",
     # Service/port operations
-    "services.update",
-    "ports.update",
+    "update_service",
+    "update_port",
 }
