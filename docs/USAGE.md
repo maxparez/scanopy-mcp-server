@@ -83,3 +83,21 @@ For GET requests, query parameters are passed in `arguments`:
   "arguments": {"limit": 10, "offset": 0}
 }
 ```
+
+## PUT/PATCH Body Requirements
+
+Some update endpoints require the path `id` **and** the same `id` in the JSON body.
+Example for `update_host`:
+
+```json
+{
+  "name": "update_host",
+  "arguments": {
+    "id": "30520c3b-617d-4f95-a14f-45f029686185",
+    "name": "switch netgear GS108E",
+    "hidden": false,
+    "tags": [],
+    "confirm": "I understand this will modify Scanopy"
+  }
+}
+```
