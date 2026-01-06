@@ -79,6 +79,8 @@ All write operations require the exact `SCANOPY_CONFIRM_STRING` to be provided i
   `name` and `tags` are required (tags can be empty list).
 - `cancel_discovery` returns 404 for invalid/unknown `session_id`.
 - `update_host` syncs children; only send empty `interfaces/ports/services` for hosts that actually have none.
+- `update_port` and `update_service` accept full objects (including readOnly fields) without errors.
+- `consolidate_hosts` is destructive (deletes `other_host`) and should be run only with explicit operator approval.
 
 ## Path Parameters
 
