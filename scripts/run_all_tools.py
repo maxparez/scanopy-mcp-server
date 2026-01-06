@@ -12,7 +12,11 @@ def main() -> None:
     parser.add_argument("--dry-run-writes", action="store_true")
     args = parser.parse_args()
 
-    report: dict[str, Any] = {"tools": [], "results": {}}
+    report: dict[str, Any] = {
+        "tools": [],
+        "results": {},
+        "dry_run": bool(args.dry_run_writes),
+    }
 
     def rpc_call(payload: dict) -> dict:
         proc = subprocess.run(
