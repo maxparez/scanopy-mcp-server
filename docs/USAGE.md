@@ -62,6 +62,11 @@ Only allowlisted write operations are permitted:
 
 All write operations require the exact `SCANOPY_CONFIRM_STRING` to be provided in the `arguments` dict.
 
+## Notes / Future Work
+
+- `cancel_discovery` requires an **active session_id**. Creating an AdHoc discovery does not guarantee an active session.
+  To support cancel, the MCP server likely needs a start/run workflow (or a way to surface active session IDs).
+
 ## Path Parameters
 
 For operations with path parameters (e.g., `/api/v1/hosts/{id}`), include the param in `arguments`:
