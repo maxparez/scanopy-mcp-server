@@ -13,7 +13,7 @@ SCANOPY_CONFIRM_STRING=I understand this will modify Scanopy
 ## Running the Server
 
 ```bash
-python -m scanopy_mcp.main
+python3 -m scanopy_mcp.main
 ```
 
 ## Smoke Test
@@ -46,7 +46,7 @@ python -m scanopy_mcp.main
 
 6. **Call a write tool (create discovery) with confirm:**
    ```bash
-   echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "create_discovery", "arguments": {"target": "192.168.1.0/24", "confirm": "I understand this will modify Scanopy"}}, "id": 6}' | python -m scanopy_mcp.main
+   echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "create_discovery", "arguments": {"name":"MCP_TEST","daemon_id":"DAEMON_ID","network_id":"NETWORK_ID","discovery_type":{"type":"Network","subnet_ids":null,"host_naming_fallback":"BestService"},"run_type":{"type":"AdHoc"},"tags":[],"confirm": "I understand this will modify Scanopy"}}, "id": 6}' | python -m scanopy_mcp.main
    ```
 
 ## Write Operations
@@ -66,6 +66,19 @@ All write operations require the exact `SCANOPY_CONFIRM_STRING` to be provided i
 
 - `cancel_discovery` requires an **active session_id**. Creating an AdHoc discovery does not guarantee an active session.
   To support cancel, the MCP server likely needs a start/run workflow (or a way to surface active session IDs).
+
+## Real Server Findings (Jan 6, 2026)
+
+- `list_networks` does **not** expose pagination/filter params in OpenAPI (empty parameters list).
+- `create_subnet` requires `network_id`, `subnet_type`, `source`, and `tags`. Sending `id=""` fails (invalid UUID).
+  Omit `id` entirely on create.
+- Creating a subnet with an existing CIDR returns the existing subnet (idempotent behavior).
+- `create_network` with API key returns 403; session-cookie calls require `organization_id`.
+  Delete network works via session cookie even though DELETE is not in OpenAPI.
+- `create_discovery` requires **object** shapes for `discovery_type` and `run_type` (strings like `"ICMP"` fail with 422).
+  `name` and `tags` are required (tags can be empty list).
+- `cancel_discovery` returns 404 for invalid/unknown `session_id`.
+- `update_host` syncs children; only send empty `interfaces/ports/services` for hosts that actually have none.
 
 ## Path Parameters
 
