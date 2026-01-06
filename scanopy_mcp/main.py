@@ -1,4 +1,27 @@
 """Main entrypoint for Scanopy MCP server."""
 
-# TODO: Implement CLI and MCP stdio transport
-# This will be completed in Task 7/9
+
+from scanopy_mcp.allowlist import WRITE_ALLOWLIST
+from scanopy_mcp.config import load_config
+from scanopy_mcp.stdio_server import MCPStdioServer
+
+
+def main() -> None:
+    """Run the Scanopy MCP server."""
+    # Load configuration from environment
+    config = load_config()
+
+    # Create stdio server
+    openapi_url = f"{config.base_url}/openapi.json"
+    server = MCPStdioServer(
+        config=config,
+        openapi_url=openapi_url,
+        allowlist=WRITE_ALLOWLIST,
+    )
+
+    # Run stdio server
+    server.run()
+
+
+if __name__ == "__main__":
+    main()
