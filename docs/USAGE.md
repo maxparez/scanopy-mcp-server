@@ -5,7 +5,7 @@
 Create a `.env` file in the project root:
 
 ```bash
-SCANOPY_BASE_URL=http://192.168.2.200:60072
+SCANOPY_BASE_URL=https://scanopy.example.com
 SCANOPY_API_KEY=your_api_key_here
 SCANOPY_CONFIRM_STRING=I understand this will modify Scanopy
 ```

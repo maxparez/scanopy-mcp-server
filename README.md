@@ -13,7 +13,7 @@ pip install -e ".[dev]"
 Create a `.env` file:
 
 ```bash
-SCANOPY_BASE_URL=http://192.168.2.200:60072
+SCANOPY_BASE_URL=https://scanopy.example.com
 SCANOPY_API_KEY=scp_u_...
 SCANOPY_CONFIRM_STRING=I understand this will modify Scanopy
 ```
