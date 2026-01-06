@@ -121,3 +121,24 @@ Example for `update_host`:
   }
 }
 ```
+
+## Discovery Request Shapes
+
+The Scanopy API expects **object** shapes for `discovery_type` and `run_type`:
+
+```json
+{
+  "name": "MCP_TEST",
+  "daemon_id": "DAEMON_ID",
+  "network_id": "NETWORK_ID",
+  "discovery_type": {
+    "type": "Network",
+    "subnet_ids": null,
+    "host_naming_fallback": "BestService"
+  },
+  "run_type": {
+    "type": "AdHoc"
+  },
+  "tags": []
+}
+```
