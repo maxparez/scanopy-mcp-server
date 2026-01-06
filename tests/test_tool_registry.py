@@ -223,3 +223,79 @@ def test_registry_resolves_ref_in_request_body_schema():
     put_schema = tools["update_host"]["input_schema"]
     assert "name" in put_schema["properties"]
     assert "name" in put_schema["required"]
+
+
+def test_registry_merges_allof_request_body_schema():
+    """Input schema should merge allOf request body schemas into properties."""
+    spec = {
+        "components": {
+            "schemas": {
+                "PartA": {
+                    "type": "object",
+                    "properties": {"a": {"type": "string"}},
+                    "required": ["a"],
+                },
+                "PartB": {
+                    "type": "object",
+                    "properties": {"b": {"type": "integer"}},
+                },
+            }
+        },
+        "paths": {
+            "/api/v1/merge": {
+                "post": {
+                    "operationId": "merge_body",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {"allOf": [{"$ref": "#/components/schemas/PartA"}, {"$ref": "#/components/schemas/PartB"}]}
+                            }
+                        }
+                    },
+                }
+            }
+        },
+    }
+
+    reg = ToolRegistry(spec, allowlist={"merge_body"})
+    tools = reg.list_tools()
+
+    schema = tools["merge_body"]["input_schema"]
+    assert "a" in schema["properties"]
+    assert "b" in schema["properties"]
+    assert "a" in schema["required"]
+
+
+def test_registry_excludes_readonly_properties_from_required():
+    """Read-only fields should not be required in input schema."""
+    spec = {
+        "paths": {
+            "/api/v1/things": {
+                "post": {
+                    "operationId": "create_thing",
+                    "requestBody": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {"type": "string", "readOnly": True},
+                                        "name": {"type": "string"},
+                                    },
+                                    "required": ["id", "name"],
+                                }
+                            }
+                        }
+                    },
+                }
+            }
+        },
+    }
+
+    reg = ToolRegistry(spec, allowlist={"create_thing"})
+    tools = reg.list_tools()
+
+    schema = tools["create_thing"]["input_schema"]
+    assert "id" not in schema["properties"]
+    assert "name" in schema["properties"]
+    assert "name" in schema["required"]

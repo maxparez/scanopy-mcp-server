@@ -89,8 +89,13 @@ class ToolRegistry:
             body_schema = self._resolve_schema(body_schema)
             if body_schema.get("type") == "object" or "properties" in body_schema:
                 for prop, prop_schema in body_schema.get("properties", {}).items():
+                    if prop_schema.get("readOnly") is True:
+                        continue
                     schema["properties"][prop] = prop_schema
                 for req in body_schema.get("required", []) or []:
+                    prop_schema = body_schema.get("properties", {}).get(req, {})
+                    if prop_schema.get("readOnly") is True:
+                        continue
                     required.add(req)
             else:
                 schema["properties"]["body"] = body_schema
@@ -132,10 +137,33 @@ class ToolRegistry:
     def _resolve_schema(self, schema: dict) -> dict:
         """Resolve local $ref schemas under #/components/schemas."""
         current = schema or {}
-        while isinstance(current, dict) and "$ref" in current:
+        if not isinstance(current, dict):
+            return {}
+
+        # Resolve $ref first
+        while "$ref" in current:
             ref = current.get("$ref", "")
             if not ref.startswith("#/components/schemas/"):
                 break
             name = ref.split("/")[-1]
             current = self._components.get(name, {})
+            if not isinstance(current, dict):
+                return {}
+
+        # Merge allOf if present
+        if "allOf" in current and isinstance(current["allOf"], list):
+            merged = {"type": "object", "properties": {}, "required": []}
+            required = set()
+            for item in current["allOf"]:
+                part = self._resolve_schema(item)
+                for prop, prop_schema in part.get("properties", {}).items():
+                    merged["properties"][prop] = prop_schema
+                for req in part.get("required", []) or []:
+                    required.add(req)
+            if required:
+                merged["required"] = sorted(required)
+            else:
+                merged.pop("required", None)
+            return merged
+
         return current or {}
