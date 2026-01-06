@@ -32,7 +32,9 @@ class ScanopyMCPServer:
         """
         return self._tools
 
-    def tools_call(self, name: str, args: dict, confirm: str | None = None) -> dict:
+    def tools_call(
+        self, name: str, args: dict, confirm: str | None = None, dry_run: bool = False
+    ) -> dict:
         """Call a tool by name.
 
         Args:
@@ -58,8 +60,13 @@ class ScanopyMCPServer:
             missing_list = ", ".join(missing)
             raise ValueError(f"Missing required fields: {missing_list}")
 
+        is_write = method in {"POST", "PUT", "PATCH", "DELETE"}
+
+        if dry_run and is_write:
+            return {"dry_run": True, "request": {"method": method, "path": path, "args": args}}
+
         # Enforce policy for write operations
-        if method in {"POST", "PUT", "PATCH", "DELETE"} and self._guard:
+        if is_write and self._guard:
             self._guard.enforce_write(name, confirm=confirm)
 
         # Pass all arguments - client will extract path params from them

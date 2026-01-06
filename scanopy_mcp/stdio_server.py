@@ -138,6 +138,10 @@ class MCPStdioServer:
             required = set(base_schema.get("required", []) or [])
 
             if is_write:
+                input_schema["properties"]["dry_run"] = {
+                    "type": "boolean",
+                    "description": "If true, skip the write and return the request payload",
+                }
                 input_schema["properties"]["confirm"] = {
                     "type": "string",
                     "description": "Confirmation string for write operations",
@@ -178,10 +182,11 @@ class MCPStdioServer:
             raise ValueError("Missing 'name' in request")
 
         arguments = params.get("arguments", {})
+        dry_run = bool(arguments.pop("dry_run", False))
         confirm = arguments.pop("confirm", None)
 
         runtime = self._get_runtime()
-        result = runtime.tools_call(name, arguments, confirm=confirm)
+        result = runtime.tools_call(name, arguments, confirm=confirm, dry_run=dry_run)
 
         return {
             "jsonrpc": "2.0",
