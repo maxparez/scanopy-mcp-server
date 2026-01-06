@@ -40,6 +40,28 @@ def test_registry_raises_on_duplicate_operation_id():
         reg.list_tools()
 
 
+def test_duplicate_detection_is_order_independent():
+    """Duplicate detection should work regardless of dict key order."""
+    # Same operationId for GET (read) and POST (write, not allowlisted)
+    # Should NOT raise because POST is filtered out
+    spec = {
+        "paths": {
+            "/api/v1/hosts": {
+                "get": {"operationId": "same.id"},
+                "post": {"operationId": "same.id"},
+            }
+        }
+    }
+
+    reg = ToolRegistry(spec, allowlist=set())  # POST not allowed
+    tools = reg.list_tools()
+
+    # Only GET should be included, no error
+    assert "same.id" in tools
+    assert tools["same.id"]["method"] == "GET"
+    assert len(tools) == 1
+
+
 def test_registry_skips_unknown_http_methods():
     """Registry should skip non-standard HTTP methods."""
     spec = {

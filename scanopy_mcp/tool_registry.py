@@ -50,14 +50,14 @@ class ToolRegistry:
                 if not op_id:
                     continue
 
-                # Check for duplicate operationId
-                if op_id in tools:
-                    raise ValueError(f"Duplicate operationId: {op_id}")
-
-                # Filter write operations by allowlist
+                # Filter write operations by allowlist FIRST
                 is_write = method.lower() in {"post", "put", "patch", "delete"}
                 if is_write and op_id not in self.allowlist:
                     continue
+
+                # Check for duplicate operationId AFTER filtering
+                if op_id in tools:
+                    raise ValueError(f"Duplicate operationId: {op_id}")
 
                 tools[op_id] = {"method": method.upper(), "path": path}
 
