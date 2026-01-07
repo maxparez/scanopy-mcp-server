@@ -42,7 +42,7 @@ claude mcp add scanopy \
   --env SCANOPY_API_KEY="$SCANOPY_API_KEY" \
   --env SCANOPY_CONFIRM_STRING="$SCANOPY_CONFIRM_STRING" \
   --env SCANOPY_SESSION_ID="$SCANOPY_SESSION_ID" \
-  -- /home/pavel/vyvoj_sw/scanopy-mcp-server/.venv/bin/python -m scanopy_mcp.main
+  -- $(pwd)/.venv/bin/python -m scanopy_mcp.main
 claude mcp list
 ```
 
@@ -56,7 +56,7 @@ codex mcp add scanopy \
   --env SCANOPY_API_KEY="$SCANOPY_API_KEY" \
   --env SCANOPY_CONFIRM_STRING="$SCANOPY_CONFIRM_STRING" \
   --env SCANOPY_SESSION_ID="$SCANOPY_SESSION_ID" \
-  -- /home/pavel/vyvoj_sw/scanopy-mcp-server/.venv/bin/python -m scanopy_mcp.main
+  -- $(pwd)/.venv/bin/python -m scanopy_mcp.main
 codex mcp list
 ```
 
@@ -67,7 +67,7 @@ Use `codex mcp invoke --name tools/list` to confirm it responds, then switch to 
 ```bash
 gemini mcp add scanopy \
   --scope user \
-  --command /home/pavel/vyvoj_sw/scanopy-mcp-server/.venv/bin/python \
+  --command $(pwd)/.venv/bin/python \
   --args -m scanopy_mcp.main
 gemini mcp list
 ```
