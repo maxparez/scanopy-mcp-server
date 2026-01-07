@@ -10,6 +10,13 @@ def test_public_docs_use_example_base_url():
     assert "https://scanopy.example.com" in usage
 
 
+def test_readme_mentions_cli_installations():
+    readme = pathlib.Path("README.md").read_text(encoding="utf-8")
+    assert "claude mcp add scanopy" in readme
+    assert "codex mcp add scanopy" in readme
+    assert "gemini mcp add scanopy" in readme
+
+
 def test_license_exists():
     assert pathlib.Path("LICENSE").exists()
 
