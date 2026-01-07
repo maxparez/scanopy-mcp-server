@@ -13,11 +13,28 @@ def test_stdio_server_handles_initialize_request():
     )
     server = MCPStdioServer(config=config, openapi_url="", allowlist=set())
 
-    request = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
+    request = {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "initialize",
+        "params": {"protocolVersion": "2024-11-05"},
+    }
     response = server.handle_request(request)
 
     assert response["result"]["serverInfo"]["name"] == "scanopy-mcp-server"
     assert response["result"]["serverInfo"]["version"] == "0.1.0"
+    assert response["result"]["protocolVersion"] == "2024-11-05"
+
+
+def test_stdio_server_ignores_initialized_notification():
+    """Server should ignore initialized notifications."""
+    config = Config(
+        base_url="http://test", api_key="key", confirm_string="CONFIRM"
+    )
+    server = MCPStdioServer(config=config, openapi_url="", allowlist=set())
+    request = {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}}
+    response = server.handle_request(request)
+    assert response is None
 
 
 def test_stdio_server_handles_tools_list_request():

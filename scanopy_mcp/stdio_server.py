@@ -61,7 +61,7 @@ class MCPStdioServer:
 
         return self._runtime
 
-    def handle_request(self, request: dict) -> dict:
+    def handle_request(self, request: dict) -> dict | None:
         """Handle a single JSON-RPC request.
 
         Args:
@@ -75,6 +75,8 @@ class MCPStdioServer:
         req_id = request.get("id")
 
         try:
+            if method in {"notifications/initialized", "initialized"}:
+                return None
             if method == "initialize":
                 return self._handle_initialize(req_id, params)
             elif method == "tools/list":
@@ -100,16 +102,18 @@ class MCPStdioServer:
         Returns:
             JSON-RPC response with server info and capabilities.
         """
+        protocol_version = params.get("protocolVersion", "2024-11-05")
         return {
             "jsonrpc": "2.0",
             "id": req_id,
             "result": {
+                "protocolVersion": protocol_version,
                 "serverInfo": {
                     "name": "scanopy-mcp-server",
                     "version": "0.1.0",
                 },
                 "capabilities": {
-                    "tools": {},
+                    "tools": {"listChanged": False},
                 },
             },
         }
@@ -209,8 +213,9 @@ class MCPStdioServer:
             try:
                 request = json.loads(line)
                 response = self.handle_request(request)
-                print(json.dumps(response))
-                sys.stdout.flush()
+                if response is not None:
+                    print(json.dumps(response))
+                    sys.stdout.flush()
             except json.JSONDecodeError:
                 error_response = {
                     "jsonrpc": "2.0",
