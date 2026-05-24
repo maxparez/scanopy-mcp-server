@@ -53,11 +53,11 @@ def main() -> None:
         # cache some ids from list endpoints
         cache: dict[str, str] = {}
         list_map = {
-            "list_networks": ("network_id",),
+            "get_all_networks": ("network_id",),
             "list_subnets": ("subnet_id",),
             "get_all_hosts": ("host_id",),
             "list_ports": ("port_id",),
-            "list_services": ("service_id",),
+            "get_all_services": ("service_id",),
             "list_discoveries": ("discovery_id",),
             "get_daemons": ("daemon_id",),
         }

@@ -36,7 +36,7 @@ python3 -m scanopy_mcp.main
 
 4. **Call a read tool with query params (list networks with filter):**
    ```bash
-   echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "list_networks", "arguments": {"limit": 10}}, "id": 4}' | python -m scanopy_mcp.main
+   echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_all_networks", "arguments": {"limit": 10}}, "id": 4}' | python -m scanopy_mcp.main
    ```
 
 5. **Call a read tool with path param (get host by ID):**
@@ -69,7 +69,7 @@ All write operations require the exact `SCANOPY_CONFIRM_STRING` to be provided i
 
 ## Real Server Findings (Jan 6, 2026)
 
-- `list_networks` does **not** expose pagination/filter params in OpenAPI (empty parameters list).
+- `get_all_networks` does **not** expose pagination/filter params in OpenAPI (empty parameters list).
 - `create_subnet` requires `network_id`, `subnet_type`, `source`, and `tags`. Sending `id=""` fails (invalid UUID).
   Omit `id` entirely on create.
 - Creating a subnet with an existing CIDR returns the existing subnet (idempotent behavior).
