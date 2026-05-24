@@ -99,7 +99,7 @@ Once installed, you can interact with Scanopy through your AI assistant:
 **In Claude Code**:
 ```
 /mcp list                           # See all available tools
-/mcp call list_networks             # Call a specific tool
+/mcp call get_all_networks           # Call a specific tool
 ```
 
 **Example conversations**:
